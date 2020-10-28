@@ -1,0 +1,15 @@
+---
+  - name: Initialize the Kubernetes cluster using kubeadm
+    become: true
+    command: kubeadm init --apiserver-advertise-address="10.17.3.2"
+
+  - name: Setup kubeconfig
+    become: true
+    command: "{{ item }}"
+    with_items:
+     - mkdir -p /root/.kube
+     - cp -i /etc/kubernetes/admin.conf /root/.kube/config
+
+  - name: Install cilium pod network
+    become: true
+    command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/v1.8/install/kubernetes/quick-install.yaml
