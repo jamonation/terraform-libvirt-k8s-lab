@@ -1,0 +1,5 @@
+- hosts: k8s-nodes
+  user: jamon
+  roles:
+    - k8s-nodes
+  tags: ['nodes']
