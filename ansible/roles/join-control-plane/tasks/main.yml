@@ -1,0 +1,24 @@
+  - name: Copy the join command to server location
+    copy: src=/tmp/join-command.sh dest=/tmp/join-command.sh mode=0777
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
+
+  - name: Add --ignore-preflight-errors override for kubeadm init
+    lineinfile:
+      path: /tmp/join-command.sh
+      backrefs: yes
+      regexp: '(--control-plane.+$)'
+      line: \g<1> --ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
+
+  - name: Join the node to cluster
+    become: true
+    command: sh /tmp/join-command.sh
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
+
+  - name: Setup kubeconfig
+    become: true
+    command: "{{ item }}"
+    with_items:
+     - mkdir -p /root/.kube
+     - cp -i /etc/kubernetes/admin.conf /root/.kube/config
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"

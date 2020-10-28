@@ -1,0 +1,17 @@
+- hosts: control_bootstrap
+  user: jamon
+  roles:
+  - control-bootstrap
+  vars:
+    - INTERFACE: ens3
+    - ROUTER_ID: 51
+    - AUTH_PASS: terraform-libvirt-linux
+    - APISERVER_VIP: 10.17.3.254
+    - APISERVER_DEST_PORT: 8080
+    - APISERVER_SRC_PORT: 6443
+    - HOST2_ID: k8s-controllers-2
+    - HOST3_ID: k8s-controllers-3
+    - HOST4_ID: k8s-controllers-4
+    - HOST2_ADDRESS: 10.17.3.2
+    - HOST3_ADDRESS: 10.17.3.3
+    - HOST4_ADDRESS: 10.17.3.4

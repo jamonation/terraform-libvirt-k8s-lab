@@ -1,0 +1,4 @@
+- hosts: all
+  user: jamon
+  roles:
+    - cluster-reset

@@ -1,7 +1,85 @@
 ---
+  - name: Wait for SSH
+    wait_for:
+      port: 22
+      delay: 30
+
+  - name: Wait for k8s to be installed
+    wait_for:
+      path: /etc/kubernetes/manifests
+
+  - name: Copy keepalived config to control plane nodes
+    become: true
+    template:
+      src: keepalived.conf.j2
+      dest: /usr/local/etc/keepalived.conf
+      owner: root
+      group: root
+      mode: 0640
+    vars:
+      STATE: "{{ 'MASTER' if ansible_facts['default_ipv4']['address'] == '10.17.3.2' else 'BACKUP'}}"
+      PRIORITY: "{{ '101' if ansible_facts['default_ipv4']['address'] == '10.17.3.2' else '100'}}"
+
+  - name: Copy keepalived check to control plane nodes
+    become: true
+    template:
+      src: check_apiserver.sh.j2
+      dest: /usr/local/etc/check_apiserver.sh
+      owner: root
+      group: root
+      mode: 0750
+
+  - name: Copy keepalived manifest to control plane nodes
+    become: true
+    copy:
+      src: keepalived.yaml
+      dest: /etc/kubernetes/manifests/keepalived.yaml
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: Copy haproxy config to control plane nodes
+    become: true
+    template:
+      src: haproxy.cfg.j2
+      dest: /usr/local/etc/haproxy.cfg
+      owner: root
+      group: root
+      mode: 0750
+    vars:
+      HOST2_ID: k8s-controllers-2
+      HOST3_ID: k8s-controllers-3
+      HOST4_ID: k8s-controllers-4
+      HOST2_ADDRESS: 10.17.3.2
+      HOST3_ADDRESS: 10.17.3.3
+      HOST4_ADDRESS: 10.17.3.4
+
+  - name: Copy haproxy manifest to control plane
+    become: true
+    template:
+      src: haproxy.yaml.j2
+      dest: /etc/kubernetes/manifests/haproxy.yaml
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: Copy init script to first control plane node
+    become: true
+    copy:
+      src: init_script.sh
+      dest: /tmp/init_script.sh
+      mode: 750
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+
   - name: Initialize the Kubernetes cluster using kubeadm
     become: true
-    command: kubeadm init --apiserver-advertise-address="10.17.3.2"
+    command: /bin/bash /tmp/init_script.sh
+    register: join_command
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+
+  - name: Copy join command to local file
+    local_action: copy content="{{ join_command.stdout }}" dest="/tmp/join-command.sh"
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
 
   - name: Setup kubeconfig
     become: true
@@ -9,7 +87,13 @@
     with_items:
      - mkdir -p /root/.kube
      - cp -i /etc/kubernetes/admin.conf /root/.kube/config
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+
+  - name: Wait for kube api to be available, then set up CNI overlay
+    wait_for:
+      port: 6443
 
   - name: Install cilium pod network
     become: true
     command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/v1.8/install/kubernetes/quick-install.yaml
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
