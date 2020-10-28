@@ -1,0 +1,19 @@
+---
+  - name: Generate join command
+    become: true
+    command: kubeadm token create --print-join-command
+    register: join_command
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+
+  - name: Copy join command to file
+    local_action: copy content="{{ join_command.stdout }}" dest="/tmp/join-command.sh"
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+
+  - name: Copy the join command to server location
+    copy: src=/tmp/join-command.sh dest=/tmp/join-command.sh mode=0777
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
+
+  - name: Join the node to cluster
+    become: true
+    command: sh /tmp/join-command.sh
+    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
