@@ -1,19 +1,54 @@
----
-  - name: Generate join command
+  - name: Copy keepalived config to control plane nodes
     become: true
-    command: kubeadm token create --print-join-command
-    register: join_command
-    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
+    template:
+      src: keepalived.conf.j2
+      dest: /usr/local/etc/keepalived.conf
+      owner: root
+      group: root
+      mode: 0640
+    vars:
+      STATE: "{{ 'MASTER' if ansible_facts['default_ipv4']['address'] == '10.17.3.2' else 'BACKUP'}}"
+      PRIORITY: "{{ '101' if ansible_facts['default_ipv4']['address'] == '10.17.3.2' else '100'}}"
 
-  - name: Copy join command to file
-    local_action: copy content="{{ join_command.stdout }}" dest="/tmp/join-command.sh"
-    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
-
-  - name: Copy the join command to server location
-    copy: src=/tmp/join-command.sh dest=/tmp/join-command.sh mode=0777
-    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
-
-  - name: Join the node to cluster
+  - name: Copy keepalived check to control plane nodes
     become: true
-    command: sh /tmp/join-command.sh
-    when: ansible_facts['default_ipv4']['address'] != "10.17.3.2"
+    template:
+      src: check_apiserver.sh.j2
+      dest: /usr/local/etc/check_apiserver.sh
+      owner: root
+      group: root
+      mode: 0750
+
+  - name: Copy keepalived manifest to control plane nodes
+    become: true
+    copy:
+      src: keepalived.yaml
+      dest: /etc/kubernetes/manifests/keepalived.yaml
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: Copy haproxy config to control plane nodes
+    become: true
+    template:
+      src: haproxy.cfg.j2
+      dest: /usr/local/etc/haproxy.cfg
+      owner: root
+      group: root
+      mode: 0750
+    vars:
+      HOST2_ID: k8s-controllers-2
+      HOST3_ID: k8s-controllers-3
+      HOST4_ID: k8s-controllers-4
+      HOST2_ADDRESS: 10.17.3.2
+      HOST3_ADDRESS: 10.17.3.3
+      HOST4_ADDRESS: 10.17.3.4
+
+  - name: Copy haproxy manifest to control plane
+    become: true
+    template:
+      src: haproxy.yaml.j2
+      dest: /etc/kubernetes/manifests/haproxy.yaml
+      owner: root
+      group: root
+      mode: 0640

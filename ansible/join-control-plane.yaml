@@ -1,0 +1,4 @@
+- hosts: control_plane
+  user: jamon
+  roles:
+    - join-control-plane
