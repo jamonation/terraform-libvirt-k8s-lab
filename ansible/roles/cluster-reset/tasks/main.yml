@@ -1,0 +1,10 @@
+---
+  - name: Reset the Kubernetes cluster using kubeadm
+    become: true
+    command: kubeadm reset --force
+
+  - name: Remove kubeconfig
+    become: true
+    file:
+     path: /root/.kube
+     state: absent
