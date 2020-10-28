@@ -1,0 +1,17 @@
+- hosts: control_bootstrap
+  user: root
+  roles:
+  - control-bootstrap
+  tags: ['control_bootstrap']
+
+- hosts: control_plane
+  user: root
+  roles:
+    - control-plane
+  tags: ['control_plane']
+
+- hosts: k8s-nodes
+  user: root
+  roles:
+    - k8s-nodes
+  tags: ['nodes']
