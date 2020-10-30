@@ -1,5 +1,5 @@
-- hosts: control_bootstrap
-  user: jamon
+- hosts: control_plane
+  user: terraform-libvirt
   roles:
   - control-bootstrap
   vars:
