@@ -1,5 +1,5 @@
 - hosts: k8s-nodes
-  user: jamon
+  user: terraform-libvirt
   roles:
     - k8s-nodes
   tags: ['nodes']
