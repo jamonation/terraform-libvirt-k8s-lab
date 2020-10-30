@@ -16,15 +16,15 @@ resource "libvirt_volume" "volume-qcow2" {
 # Use CloudInit to add the instance
 resource "libvirt_cloudinit_disk" "commoninit" {
   count = var.number
-  name      = "${var.volume-prefix}.commoninit-${count.index}.iso"
+  name  = "${var.volume-prefix}.commoninit-${count.index}.iso"
   user_data = templatefile("../modules/k8s-control-plane/cloud_init.cfg", {
-    hostname = "k8s-controllers-${count.index + 2}"
+    hostname       = "k8s-controllers-${count.index + 2}"
     ssh-public-key = var.ssh-public-key
   })
   network_config = templatefile("../modules/k8s-control-plane/network_config.cfg", {
-    ip_address = "10.17.3.${count.index+2}"
-    netmask = var.netmask
-    gateway = var.gateway
+    ip_address  = "10.17.3.${count.index + 2}"
+    netmask     = var.netmask
+    gateway     = var.gateway
     nameservers = jsonencode(var.nameservers)
   })
 }
@@ -36,8 +36,8 @@ resource "libvirt_domain" "k8s-controllers" {
   name   = "k8s-controllers-${count.index + 2}"
 
   network_interface {
-    network_name   = "k8snet"
-    hostname = "k8s-controllers-${count.index + 2}"
+    network_name = "k8snet"
+    hostname     = "k8s-controllers-${count.index + 2}"
   }
 
   disk {

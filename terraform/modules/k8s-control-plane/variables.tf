@@ -41,23 +41,23 @@ variable "network_id" {
 
 variable "netmask" {
   description = "Netmask for k8snet"
-  type = string
-  default = "24"
+  type        = string
+  default     = "24"
 }
 
 variable "gateway" {
   description = "Gateway for k8snet"
-  type = string
-  default = "10.17.3.1"
+  type        = string
+  default     = "10.17.3.1"
 }
 
 variable "nameservers" {
   description = "Resolvers for k8snet"
-  type = list
-  default = ["10.0.0.10","1.1.1.1"]
+  type        = list
+  default     = ["10.0.0.10", "1.1.1.1"]
 }
 
 variable "ssh-public-key" {
   description = "ssh-rsa key for terraform-libvirt user"
-  default = ""
+  default     = ""
 }

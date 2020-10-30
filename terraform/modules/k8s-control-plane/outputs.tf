@@ -8,6 +8,6 @@ output "ip_addresses" {
 output "user_data" {
   value = {
     for data in libvirt_cloudinit_disk.commoninit :
-      data.id => data.user_data
+    data.id => data.user_data
   }
 }
