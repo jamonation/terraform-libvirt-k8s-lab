@@ -1,4 +1,5 @@
 - hosts: all
-  user: jamon
+  user: terraform-libvirt
+  become: true
   roles:
     - cluster-reset
