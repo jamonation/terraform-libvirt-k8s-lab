@@ -69,3 +69,8 @@ variable "nodes-volume-prefix" {
   default = "k8s"
   type = string
 }
+
+variable "ssh-public-key" {
+  description = "ssh-rsa key for terraform-libvirt user"
+  default = ""
+}
