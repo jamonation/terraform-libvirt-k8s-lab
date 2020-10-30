@@ -6,7 +6,7 @@ resource "libvirt_volume" "os_image" {
 
 resource "libvirt_volume" "volume-qcow2" {
   count          = var.number
-  name           = "${var.volume-prefix}-${count.index+2}.qcow2"
+  name           = "${var.volume-prefix}-${count.index + 2}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
   pool           = "default"
   format         = "qcow2"
@@ -16,15 +16,15 @@ resource "libvirt_volume" "volume-qcow2" {
 # Use CloudInit to add the instance
 resource "libvirt_cloudinit_disk" "commoninit" {
   count = var.number
-  name      = "${var.volume-prefix}.commoninit-${count.index}.iso"
+  name  = "${var.volume-prefix}.commoninit-${count.index}.iso"
   user_data = templatefile("../modules/k8s-control-plane/cloud_init.cfg", {
-    hostname = "k8s-nodes-${count.index+2}"
+    hostname       = "k8s-nodes-${count.index + 2}"
     ssh-public-key = var.ssh-public-key
   })
   network_config = templatefile("../modules/k8s-nodes/network_config.cfg", {
-    ip_address = "10.17.3.${10+count.index}"
-    netmask = var.netmask
-    gateway = var.gateway
+    ip_address  = "10.17.3.${10 + count.index}"
+    netmask     = var.netmask
+    gateway     = var.gateway
     nameservers = jsonencode(var.nameservers)
   })
 }
@@ -33,11 +33,11 @@ resource "libvirt_domain" "k8s-nodes" {
   memory = var.memory
   vcpu   = var.vcpus
   count  = var.number
-  name   = "k8s-nodes-${count.index+2}"
+  name   = "k8s-nodes-${count.index + 2}"
 
   network_interface {
-    network_name   = "k8snet"
-    hostname = "k8s-nodes-${count.index+2}"
+    network_name = "k8snet"
+    hostname     = "k8s-nodes-${count.index + 2}"
   }
 
   disk {
@@ -47,14 +47,14 @@ resource "libvirt_domain" "k8s-nodes" {
   cloudinit = libvirt_cloudinit_disk.commoninit[count.index].id
 
   console {
-    type = "pty"
+    type        = "pty"
     target_type = "serial"
     target_port = "0"
   }
 
   graphics {
-    type = "spice"
+    type        = "spice"
     listen_type = "address"
-    autoport = true
+    autoport    = true
   }
 }
