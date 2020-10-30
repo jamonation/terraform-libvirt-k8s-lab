@@ -56,3 +56,8 @@ variable "nameservers" {
   type = list
   default = ["10.0.0.10","1.1.1.1"]
 }
+
+variable "ssh-public-key" {
+  description = "ssh-rsa key for terraform-libvirt user"
+  default = ""
+}
