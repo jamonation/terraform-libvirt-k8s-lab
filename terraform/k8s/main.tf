@@ -11,6 +11,7 @@ module "k8s-control-plane" {
   memory        = var.control-memory
   volume-prefix = var.control-volume-prefix
   size          = var.control-volume-size
+  ssh-public-key = var.ssh-public-key
 
   network_id    = module.network.network_id
   depends_on	= [module.network]
@@ -26,6 +27,7 @@ module "k8s-nodes" {
   memory        = var.nodes-memory
   volume-prefix = var.nodes-volume-prefix
   size          = var.nodes-volume-size
+  ssh-public-key = var.ssh-public-key
 
   network_id    = module.network.network_id
   depends_on	= [module.network]
