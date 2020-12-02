@@ -14,7 +14,7 @@ This repository contains all the Terraform modules and Ansible roles that you ne
 
 The Terraform modules use the [`libvirt` terraform provider](https://github.com/dmacvicar/terraform-provider-libvirt) to provision a virtual network and virtual machines, so you'll need to be running `libvirtd` on Linux to be able to use this repository.
 
-The stacked Kubernetes control plane is managed using (HAProxy and Keepalived)[https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md#keepalived-and-haproxy] running as static pods on the control plane VMs.
+The stacked Kubernetes control plane is managed using [HAProxy and Keepalived]([https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md#keepalived-and-haproxy) running as static pods on the control plane VMs.
 
 ## Requirements
 
