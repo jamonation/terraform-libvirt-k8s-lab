@@ -93,12 +93,13 @@
 
   - name: Install cilium pod network
     become: true
-    command: kubectl --kubeconfig /etc/kubernetes/admin.conf create -f https://raw.githubusercontent.com/cilium/cilium/v1.8/install/kubernetes/quick-install.yaml
+    command: kubectl --kubeconfig /etc/kubernetes/admin.conf create -f https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-install.yaml
     when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
 
   - name: Wait for cilium
     wait_for:
-      delay: 60
+      port: 4240
+    when: ansible_facts['default_ipv4']['address'] == "10.17.3.2"
 
   - name: Join the node to the cluster
     become: true

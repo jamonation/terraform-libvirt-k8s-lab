@@ -38,6 +38,10 @@ resource "libvirt_domain" "k8s-controllers" {
   network_interface {
     network_name = "k8snet"
     hostname     = "k8s-controllers-${count.index + 2}"
+
+    # Note this isn't actually used - cloud-init sets the IP
+    # The address is included here for use in output.tf
+    addresses   = ["10.17.3.${count.index + 2}"]
   }
 
   disk {

@@ -1,5 +1,4 @@
-- hosts: k8s-nodes
+- hosts: ["control-bootstrap", "nodes"]
   user: terraform-libvirt
   roles:
     - k8s-nodes
-  tags: ['nodes']

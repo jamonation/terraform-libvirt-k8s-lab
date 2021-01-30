@@ -19,7 +19,7 @@ variable "control-number" {
 variable "control-volume-size" {
   description = "How large a root disk volume (default 25GB)"
   type        = number
-  default     = 26806965760
+  default     = 16806965760
 }
 
 variable "control-image" {
