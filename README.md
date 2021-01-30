@@ -6,15 +6,15 @@
 
 A home lab is a great way to explore and learn about different tools, architectures, and development methods.
 
-The idea is to use Terraform and Ansible to build a local Kubernetes cluster that is more extensible, and closer to a production architecture than many of the typical single-machine example environments.
+The idea behind this repository is to use Terraform and Ansible to build a local Kubernetes cluster that is more extensible, and closer to a production architecture than many of the typical single-machine example environments.
 
 ## About
 
-This repository contains all the Terraform modules and Ansible roles that you need to build a local [High Availability Kubernetes cluster](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/) that you can experiment with using KVM locally.
+This repository contains all the Terraform modules and Ansible roles that you need to build a local [High Availability Kubernetes cluster](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/) that you can experiment with.
 
-The Terraform modules use the [`libvirt` terraform provider](https://github.com/dmacvicar/terraform-provider-libvirt) tp provision a virtual network and virtual machines, so you'll need to be running `libvirtd` on Linux to be able to use this repository.
+The Terraform modules use the [`libvirt` terraform provider](https://github.com/dmacvicar/terraform-provider-libvirt) to provision a virtual network and virtual machines, so you'll need to be running `libvirtd` on Linux to be able to use this repository.
 
-The stacked Kubernetes control plane is managed using (HAProxy and Keepalived)[https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md#keepalived-and-haproxy] running as static pods on the control plane VMs.
+The stacked Kubernetes control plane is managed using [HAProxy and Keepalived]([https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md#keepalived-and-haproxy) running as static pods on the control plane VMs.
 
 ## Requirements
 
@@ -33,7 +33,22 @@ Running `terraform apply` with no variable arguments will create 5 Kubernetes no
 
 Once the VMs are up, running `ansible-playbook -i hosts bootstrap.yaml` in the `ansible` directory will bootstrap the Kubernetes control plane on one VM. The role will also generate a token for other `control-plane` nodes and will use that on the remaining nodes to join them to the cluster
 
-using a virtual IP that is managed by HAProxy and Keepalived.
+Kubernetes is accessed using a virtual IP that is managed by HAProxy and Keepalived. The IP address is `10.17.3.254`.
+
+Each of the VMs has a static IP address for ease of access and keeping track of what lives where. The machines (in the default configuration) are:
+
+```
+k8s-controller-2 10.17.3.2
+k8s-controller-3 10.17.3.3
+k8s-controller-4 10.17.3.4
+
+k8s-nodes-2 10.17.3.10
+k8s-nodes-3 10.17.3.11
+```
+
+The guest hostname are indexed roughly according to their IP address - since 10.17.3.1 is the gateway, the nodes and IPs start at `2`.
+
+**Todo: fix the k8s-nodes indexing to use an offset of 10.**
 
 ## Helpful resources, kudos, and credits
 
