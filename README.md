@@ -1,6 +1,6 @@
 # Terraform + libvirt + Ansible = HA Kubernetes Lab
 
-![Image](https://jamon.ca/terraform-libvirt-k8s-lab.png)
+![Image](https://raw.githubusercontent.com/jamonation/terraform-libvirt-k8s-lab/assets/terraform-libvirt-k8s-lab.png)
 
 ## Introduction
 
