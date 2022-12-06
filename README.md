@@ -24,16 +24,34 @@ To use this repository you will need the following on your local machine:
 * Ansible
 * Terraform >= v0.13
 * libvirt with a `default` storage pool - the [`network module`](https://github.com/jamonation/terraform-libvirt-k8s-lab/tree/main/terraform/modules/network) in this repository will define a network for you
-* [terraform-provider-libvirt](https://github.com/dmacvicar/terraform-provider-libvirt) - make sure to install the plugin in `~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/0.6.2/linux_amd64/terraform-provider-libvirt`
+* [terraform-provider-libvirt](https://github.com/dmacvicar/terraform-provider-libvirt)
 * Enough CPU, RAM, and disk space to run two libvirt guests - the more the better!
 
 ## Using this repository
 
+**Before using terraform** add your **public*** key, excluding the `ssh-rsa` prefix in the various `variables.tf` files corresponding sections:
+
+```
+variable "ssh-public-key" {
+  description = "ssh-rsa key for terraform-libvirt user"
+  default     = "<KEY GOES HERE>"
+}
+```
+
 Running `terraform apply` with no variable arguments will create 5 Kubernetes nodes - 3 control plane, and 2 nodes for workloads. Each will use 2 CPUs, and have 2GB of RAM allocated.
 
-Once the VMs are up, running `ansible-playbook -i hosts bootstrap.yaml` in the `ansible` directory will bootstrap the Kubernetes control plane on one VM. The role will also generate a token for other `control-plane` nodes and will use that on the remaining nodes to join them to the cluster
+**Before using ansible** you need to add the following to your `~/.ssh/config` to avoid having fingerprint check botch your ansible configuration:
+
+```
+Host 10.17.3.*
+  StrictHostKeyChecking no
+```
+
+Once the VMs are up, running `ansible-playbook -i hosts bootstrap.yaml` in the `ansible` directory will bootstrap the Kubernetes control plane on one VM. The role will also generate a token for other `control-plane` nodes and will use that on the remaining nodes to join them to the cluster.
 
 Kubernetes is accessed using a virtual IP that is managed by HAProxy and Keepalived. The IP address is `10.17.3.254`.
+
+Running `ansible-playbook -i hosts local-config.yaml` will copy `admin.conf` to the playbook directory to be used along with `kubectl` as `kubectl --kubeconfig admin.conf get namespace`.
 
 Each of the VMs has a static IP address for ease of access and keeping track of what lives where. The machines (in the default configuration) are:
 
